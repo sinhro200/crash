@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Пример веб-страницы</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+ </head>
+ <body>
+  <h1>Заголовок</h1>
+  <button onclick="start()">START</button>
+  <button onclick="stop()">STOP</button>
+  <div id="container" onclick="changeBack()" style="background-color: #123321;">
+    <p>Первый абзац.</p>
+  </div>
+  <p>Второй абзац.</p>
+  <canvas id="line-chart" width="800" height="450"></canvas>
+<script>
+    var prevValue = 1;
+    const duration = 100;
+    const previousY = (ctx) => prevValue ;
+
+var options = {
+	responsive: true,
+	maintainAspectRatio: true,
+	animation: {
+        x:{
+            type: 'number',
+            easing: 'linear',
+            duration: duration,
+        },
+        y: {
+            type: 'number',
+            easing: 'linear',
+            duration: duration,
+            // from: previousY,
+        },
+		easing: 'linear',
+		duration: duration
+	},
+	scales: {
+		xAxes: [{
+			gridLines: {
+				color: 'rgba(200, 200, 200, 0.05)',
+				lineWidth: 1
+			}
+		}],
+		yAxes: [{
+			gridLines: {
+				color: 'rgba(200, 200, 200, 0.08)',
+				lineWidth: 1
+			}
+		}],
+        y: {
+            beginAtZero: true // назначили оси Y начинать отсчет с нуля
+          }
+	},
+	legend: {
+		display: false
+	},
+	point: {
+		backgroundColor: 'white'
+	},
+	tooltips: {
+		titleFontFamily: 'Open Sans',
+		backgroundColor: 'rgba(0,0,0,0.3)',
+		titleFontColor: 'red',
+		caretSize: 5,
+		cornerRadius: 2,
+		xPadding: 10,
+		yPadding: 10
+	}
+};
+
+
+
+let GCHART = new Chart(document.getElementById("line-chart"), {
+  type: 'line',
+  data: {
+    datasets: [ { 
+        data: [],
+        label: "CRASH",
+        borderColor: "#c45850",
+        fill: false
+      }
+    ]
+  },
+  options: options
+});
+</script>
+ </body>
+ 
+ <script>
+    var container = document.getElementById("container");
+    var sas = true;
+      function changeBack() {
+          if(sas)
+            container.style.backgroundColor = "#005566";
+          else
+            container.style.backgroundColor = "#66aa33";
+        sas = !sas;
+      }
+    </script>
+    <script>
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+        var x = 1;
+        
+        var value = 1;
+        
+        function updateData(){
+            x = x + 0.3;
+            prevValue = value;
+            value = Math.pow(2, x);
+        }
+        function main(){
+            updateData();
+            updateScale(GCHART,x - 10, x -2 );
+            addData(GCHART,x,value);
+        }
+
+        function updateScale(chart,minX, maxX) {
+            chart.options.scales.x = {
+                min: minX,
+                max: maxX,
+            };
+            chart.update();
+        }
+
+        // повторить с интервалом 2 секунды
+        let timerId ;
+        function start(){
+            timerId = setInterval(
+                () => main(),
+                duration
+            );
+        }
+        
+        function stop(){
+            clearInterval(timerId);  
+        }
+        
+        start();
+    </script>
+
+</html>
